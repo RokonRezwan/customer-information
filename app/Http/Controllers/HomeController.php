@@ -14,7 +14,7 @@ class HomeController extends Controller
 
     public function index()
     {
-        $customers = Customer::all();
+        $customers = Customer::get(['id', 'area_id', 'code', 'name', 'age']);
         return view('home', compact('customers'));
     }
 }

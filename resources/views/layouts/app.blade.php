@@ -86,14 +86,14 @@
                 @if (session('success'))
                         <div class="row">
                             <div class="alert alert-success text-center" role="alert">
-                                {{ session('status') }}
+                                {{ session('success') }}
                             </div>
                         </div>
                     @endif
 
                 @if(session('error'))
                     <div class="alert alert-danger text-center" role="alert">
-                    {{ session('errorMsg') }}
+                    {{ session('error') }}
                     </div> 
                 @endif
 
@@ -110,5 +110,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
 
     @yield('scripts')
+
+    <script>
+        $(document).ready(function() {
+                $("div.alert").delay(5000).slideUp(300);
+            });
+    </script>
 </body>
 </html>

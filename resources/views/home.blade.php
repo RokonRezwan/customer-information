@@ -16,7 +16,7 @@
                                     <th class="text-center border border-dark rounded">Full Name</th>
                                     <th class="text-center border border-dark rounded">Age</th>
                                     <th class="text-center border border-dark rounded">Location</th>
-                                    <th class="text-center border border-dark rounded"><a href="#"><i class="fa-solid fa-plus"></i></a></th>
+                                    <th class="text-center border border-dark rounded"><a href="{{ route('customers.create') }}"><i class="fa-solid fa-plus"></i></a></th>
                                 </tr>
                             </thead>
 
@@ -39,7 +39,12 @@
                                             {{ optional($customer->area)->area_name ?? 'Undefiend' }}
                                         </td>
                                         <td class="text-center">
-                                            <a href="#"><i class="fa-solid fa-minus"></i></a>
+                                            <form action="{{ route('customers.destroy', $customer->id) }}" method="post">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this Customer ?')"><i class="fa-solid fa-minus"></i></button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
