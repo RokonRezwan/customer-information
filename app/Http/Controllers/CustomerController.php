@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Area;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
     public function index()
     {
-        //
+        $customers = Customer::get(['id', 'area_id', 'code', 'name', 'age']);
+        $areas = Area::get(['id', 'area_name']);
+        return view('customers.index', compact('customers', 'areas'));
     }
 
     public function create()
@@ -22,42 +25,43 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         try {
-            $customer = new Customer; 
+            DB::transaction(function () use($request) {
 
-                $customer->name = $request->name;
-                $customer->code = random_int(100000,999999);
-                $customer->age = $request->age;
-                $customer->area_id = $request->area_id;
+                $names = $request->name;
+                $ages = $request->age;
+                $area_ids = $request->area_id;
 
-                $customer->save();
-                
-        } catch (QueryException $e) {
+                $area = Area::all();
+                $serial = Customer::get('id')->count();
 
-            return redirect()->route('home')->with(['error' => $e->getMessage()]);
-        }
+                $customers = [];
 
-        return redirect()->route('home')->with('success', 'Customer has been created successfully.');
+                if(($names !== NULL) && ($area_ids !== NULL)){
+                    foreach ($names as $index => $name) {
+                        $code = $area[$index]->area_code.'00'.$serial;
+                        $customers[] = [
+                            'code' => $code,
+                            'name' => $name,
+                            'area_id' => $area_ids[$index],
+                            'age' => $ages[$index],
+                        ];
+                        Customer::insert($customers);
+                    }
+                }
+            });
+
+            } catch (QueryException $e) {
+
+                return redirect()->route('customers.index')->with(['error' => $e->getMessage()]);
+            }
+
+        return redirect()->route('customers.index')->with('success', 'Customer has been added successfully.');
     }
-
-    public function show(Customer $customer)
-    {
-        //
-    }
-
-    public function edit(Customer $customer)
-    {
-        //
-    }
-
-    public function update(Request $request, Customer $customer)
-    {
-        //
-    }
-
+    
     public function destroy(Customer $customer)
     {
         $customer->delete();
 
-        return redirect()->route('home')->with('success','Customer has been deleted successfully !');
+        return redirect()->route('customers.index')->with('success','Customer has been deleted successfully !');
     }
 }
